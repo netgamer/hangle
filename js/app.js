@@ -1,5 +1,5 @@
 // ============================================================
-// 한글 공부 - 듀오링고 스타일 메인 엔진
+// 한글 공부 - Premium App Engine
 // ============================================================
 
 const App = {
@@ -11,6 +11,41 @@ const App = {
   init() {
     this.xp = parseInt(localStorage.getItem('hg_xp')) || 0;
     this.showHome();
+  },
+
+  // ═══════════════════════════
+  //  화면 전환 (fade animation)
+  // ═══════════════════════════
+  _transitionTo(renderFn) {
+    const area = document.getElementById('lesson-area');
+    area.classList.remove('fade-enter');
+    // Force reflow
+    void area.offsetWidth;
+    renderFn();
+    area.classList.add('fade-enter');
+  },
+
+  // ═══════════════════════════
+  //  컨페티 효과
+  // ═══════════════════════════
+  confetti() {
+    const container = document.getElementById('confetti-container');
+    const colors = ['#58CC02','#1CB0F6','#FFC800','#A855F7','#EC4899','#F97316','#FF4B4B'];
+    for (let i = 0; i < 40; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + 'vw';
+      piece.style.top = '-10px';
+      piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.setProperty('--fall-duration', (1.5 + Math.random() * 1.5) + 's');
+      piece.style.setProperty('--rotation', (360 + Math.random() * 720) + 'deg');
+      piece.style.width = (6 + Math.random() * 8) + 'px';
+      piece.style.height = (6 + Math.random() * 8) + 'px';
+      piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      piece.style.animationDelay = (Math.random() * 0.5) + 's';
+      container.appendChild(piece);
+      setTimeout(() => piece.remove(), 3500);
+    }
   },
 
   // ═══════════════════════════
@@ -26,11 +61,11 @@ const App = {
     const streak = SRS.getStreak();
 
     const stages = [
-      { n:1, icon:'🔤', title:'자음', desc:'ㄱ ㄴ ㄷ ㄹ... 기본 자음 19개', color:'--pink' },
-      { n:2, icon:'🌈', title:'모음', desc:'ㅏ ㅓ ㅗ ㅜ... 기본+복합 모음 16개', color:'--blue' },
-      { n:3, icon:'🧩', title:'글자 조합', desc:'자음+모음 → 가 나 다... 한글 만들기', color:'--green' },
-      { n:4, icon:'📚', title:'단어', desc:'기초 단어 읽고 뜻 맞추기', color:'--orange' },
-      { n:5, icon:'✍️', title:'받아쓰기', desc:'듣고 직접 써보기', color:'--purple' },
+      { n:1, icon:'🔤', title:'자음', desc:'ㄱ ㄴ ㄷ ㄹ... 기본 자음 19개', color:'pink' },
+      { n:2, icon:'🌈', title:'모음', desc:'ㅏ ㅓ ㅗ ㅜ... 기본+복합 모음 16개', color:'blue' },
+      { n:3, icon:'🧩', title:'글자 조합', desc:'자음+모음 → 가 나 다... 한글 만들기', color:'green' },
+      { n:4, icon:'📚', title:'단어', desc:'기초 단어 읽고 뜻 맞추기', color:'orange' },
+      { n:5, icon:'✍️', title:'받아쓰기', desc:'듣고 직접 써보기', color:'purple' },
     ];
 
     let currentStage = 1;
@@ -39,31 +74,35 @@ const App = {
       else break;
     }
 
-    const area = document.getElementById('lesson-area');
-    area.innerHTML = `
-      <div class="home">
-        <div class="home-title"><span style="font-size:2rem">🐰</span> 한글 공부</div>
-        <div class="home-stats">
-          <span>🔥 ${streak}일 연속</span>
-          <span>⭐ ${this.xp} XP</span>
+    this._transitionTo(() => {
+      const area = document.getElementById('lesson-area');
+      area.innerHTML = `
+        <div class="home">
+          <div class="home-title">
+            <span class="logo-emoji">🐰</span> 한글 공부
+          </div>
+          <div class="home-stats">
+            <div class="home-stat">🔥 ${streak}일 연속</div>
+            <div class="home-stat">⭐ ${this.xp} XP</div>
+          </div>
+          ${stages.map(s => {
+            const p = prog[s.n] || 0;
+            const done = p >= 80;
+            const cur = s.n === currentStage;
+            const cls = done ? 'done' : cur ? 'current' : '';
+            return `
+              <button class="stage-btn ${cls}" onclick="App.startLesson(${s.n})">
+                <div class="s-icon">${s.icon}</div>
+                <div class="s-info">
+                  <div class="s-title">${s.title}</div>
+                  <div class="s-desc">${s.desc}</div>
+                </div>
+                <div class="s-prog">${done ? '✅' : p > 0 ? p + '%' : '·'}</div>
+              </button>`;
+          }).join('')}
         </div>
-        ${stages.map(s => {
-          const p = prog[s.n] || 0;
-          const done = p >= 80;
-          const cur = s.n === currentStage;
-          const cls = done ? 'done' : cur ? 'current' : '';
-          return `
-            <button class="stage-btn ${cls}" onclick="App.startLesson(${s.n})">
-              <div class="s-icon">${s.icon}</div>
-              <div class="s-info">
-                <div class="s-title">${s.title}</div>
-                <div class="s-desc">${s.desc}</div>
-              </div>
-              <div class="s-prog">${done ? '✅' : p > 0 ? p + '%' : '·'}</div>
-            </button>`;
-        }).join('')}
-      </div>
-    `;
+      `;
+    });
   },
 
   // ═══════════════════════════
@@ -92,7 +131,7 @@ const App = {
   },
 
   // ═══════════════════════════
-  //  상단 바 업데이트
+  //  상단 바
   // ═══════════════════════════
   updateTopBar(current, total) {
     const pct = total > 0 ? Math.round((current / total) * 100) : 0;
@@ -129,7 +168,7 @@ const App = {
   },
 
   // ═══════════════════════════
-  //  피드백 바 (초록/빨강 슬라이드업)
+  //  피드백 바
   // ═══════════════════════════
   showCorrectFeedback(onNext) {
     this.hideBottom();
@@ -185,11 +224,11 @@ const App = {
     const el = document.getElementById('heart-count');
     el.textContent = this.hearts;
     el.parentElement.classList.add('heart-break');
-    setTimeout(() => el.parentElement.classList.remove('heart-break'), 600);
+    setTimeout(() => el.parentElement.classList.remove('heart-break'), 700);
   },
 
   _randomCheer() {
-    const arr = ['대단해요!','최고!','멋져요!','완벽!','훌륭해요!'];
+    const arr = ['대단해요!','최고!','멋져요!','완벽!','훌륭해요!','천재!','실력이 느는걸요!'];
     return ' ' + arr[Math.floor(Math.random() * arr.length)];
   },
 
@@ -205,24 +244,21 @@ const App = {
     pop.className = 'xp-popup';
     pop.textContent = `+${amount} ⭐`;
     document.body.appendChild(pop);
-    setTimeout(() => pop.remove(), 1100);
+    setTimeout(() => pop.remove(), 1400);
   },
 
   // ═══════════════════════════
   //  유틸리티
   // ═══════════════════════════
-  // TTS: 미리 생성된 mp3 사용, 없으면 Web Speech API 폴백
   _audioCache: {},
   _currentAudio: null,
 
   speak(text, rate = 1) {
-    // 기존 재생 중지
     if (this._currentAudio) {
       this._currentAudio.pause();
       this._currentAudio.currentTime = 0;
     }
 
-    // 키 매핑: text → 오디오 파일명 찾기
     const key = this._findAudioKey(text);
     if (key) {
       const path = `audio/${key}.mp3`;
@@ -238,12 +274,10 @@ const App = {
       return;
     }
 
-    // mp3 없으면 Web Speech API 폴백
     this._fallbackSpeak(text, rate);
   },
 
   _findAudioKey(text) {
-    // 자음 이름 → 파일 매핑
     const consonantMap = {
       'ㄱ':'c_ㄱ','ㄴ':'c_ㄴ','ㄷ':'c_ㄷ','ㄹ':'c_ㄹ','ㅁ':'c_ㅁ',
       'ㅂ':'c_ㅂ','ㅅ':'c_ㅅ','ㅇ':'c_ㅇ','ㅈ':'c_ㅈ','ㅊ':'c_ㅊ',
@@ -252,7 +286,6 @@ const App = {
     };
     if (consonantMap[text]) return consonantMap[text];
 
-    // 모음
     const vowelMap = {
       'ㅏ':'v_ㅏ','ㅑ':'v_ㅑ','ㅓ':'v_ㅓ','ㅕ':'v_ㅕ','ㅗ':'v_ㅗ',
       'ㅛ':'v_ㅛ','ㅜ':'v_ㅜ','ㅠ':'v_ㅠ','ㅡ':'v_ㅡ','ㅣ':'v_ㅣ',
@@ -260,17 +293,14 @@ const App = {
     };
     if (vowelMap[text]) return vowelMap[text];
 
-    // 조합 글자 / 단어 / 받아쓰기: 여러 prefix 시도
     const prefixes = ['j_', 'w_', 'd_'];
     const safeText = text.replace(/ /g, '_');
     for (const p of prefixes) {
       const key = p + safeText;
-      // 캐시에 있거나 시도
       if (this._audioCache[key]) return key;
     }
-    // 없으면 순서대로 시도 (첫 로드)
     for (const p of prefixes) {
-      return p + safeText;  // 시도해보고 실패하면 폴백
+      return p + safeText;
     }
     return null;
   },

@@ -1,5 +1,5 @@
 // ============================================================
-// 3단계: 글자 조합 - 듀오링고 플로우
+// 3단계: 글자 조합 - Premium Flow
 // ============================================================
 
 const Step3 = {
@@ -49,16 +49,18 @@ const Step3 = {
   showLearn(item) {
     const d = HG.decompose(item.char);
     const parts = d ? `${d.i} + ${d.m}${d.f ? ' + ' + d.f : ''}` : item.desc;
-    const area = document.getElementById('lesson-area');
-    area.innerHTML = `
-      <div class="q-prompt">글자를 조합해요! 🧩</div>
-      <div class="learn-card" onclick="App.speak('${item.char}')">
-        <div class="lc-char" style="color:var(--green)">${item.char}</div>
-        <div class="lc-sub" style="font-size:1.4rem;margin-top:0.5rem">${parts}</div>
-        <div class="lc-hint">${item.desc}</div>
-        <div class="lc-tap">👆 터치하면 소리가 나요</div>
-      </div>
-    `;
+    App._transitionTo(() => {
+      const area = document.getElementById('lesson-area');
+      area.innerHTML = `
+        <div class="q-prompt">글자를 조합해요!</div>
+        <div class="learn-card" onclick="App.speak('${item.char}')">
+          <div class="lc-char" style="color:var(--green)">${item.char}</div>
+          <div class="lc-sub" style="font-size:1.4rem;margin-top:0.5rem">${parts}</div>
+          <div class="lc-hint">${item.desc}</div>
+          <div class="lc-tap">터치하면 소리가 나요</div>
+        </div>
+      `;
+    });
     Sound.flip();
     setTimeout(() => App.speak(item.char), 400);
     SRS.markLearned(`j_${item.char}`);
@@ -74,14 +76,16 @@ const Step3 = {
     const allChars = this.lessons.map(l => l.char);
     const opts = App.genOpts(item.char, allChars, 4);
 
-    const area = document.getElementById('lesson-area');
-    area.innerHTML = `
-      <div class="q-prompt">이 조합으로 만들어지는 글자는?</div>
-      <div class="q-big" style="color:var(--green)">${parts}</div>
-      <div class="opts">
-        ${opts.map(o => `<button class="opt" data-v="${o}" onclick="Step3.select(this)">${o}</button>`).join('')}
-      </div>
-    `;
+    App._transitionTo(() => {
+      const area = document.getElementById('lesson-area');
+      area.innerHTML = `
+        <div class="q-prompt">이 조합으로 만들어지는 글자는?</div>
+        <div class="q-big" style="color:var(--green)">${parts}</div>
+        <div class="opts">
+          ${opts.map(o => `<button class="opt" data-v="${o}" onclick="Step3.select(this)">${o}</button>`).join('')}
+        </div>
+      `;
+    });
     App.showCheckDisabled();
     this._correct = item.char; this._item = item;
   },
@@ -115,25 +119,38 @@ const Step3 = {
 
   showEnd(type) {
     App.hideBottom();
-    const area = document.getElementById('lesson-area');
     if (type === 'fail') {
       Sound.gameOver();
-      area.innerHTML = `<div class="done-screen"><div class="d-emoji">💔</div><h2>하트가 없어요!</h2><button class="d-btn green" onclick="App.startLesson(3)">다시 하기</button><button class="d-btn blue" onclick="App.goHome()" style="margin-top:0.4rem">홈으로</button></div>`;
+      App._transitionTo(() => {
+        const area = document.getElementById('lesson-area');
+        area.innerHTML = `
+          <div class="done-screen">
+            <div class="d-emoji">💔</div>
+            <h2>하트가 없어요!</h2>
+            <p>다시 도전해요</p>
+            <button class="d-btn green" onclick="App.startLesson(3)">다시 하기</button>
+            <button class="d-btn blue" onclick="App.goHome()" style="margin-top:0.4rem">홈으로</button>
+          </div>`;
+      });
       return;
     }
     Sound.complete();
+    App.confetti();
     this.cursor = Math.min(this.cursor + 3, this.lessons.length);
     SRS.setProgress(3, Math.round((this.cursor / this.lessons.length) * 100));
     SRS.bumpStreak();
     const allDone = this.cursor >= this.lessons.length;
-    area.innerHTML = `
-      <div class="done-screen">
-        <div class="d-emoji">${allDone ? '🧩' : '👏'}</div>
-        <h2>${allDone ? '조합 완료!' : '잘했어요!'}</h2>
-        <div class="d-xp">+${this.exercises.filter(e => e.type === 'quiz').length * 10} ⭐</div>
-        <p>${allDone ? '글자 조합을 마스터했어요!' : `${this.cursor}/${this.lessons.length} 학습 완료`}</p>
-        ${allDone ? '' : `<button class="d-btn green" onclick="Step3.buildExercises()">계속 배우기</button>`}
-        <button class="d-btn blue" onclick="App.goHome()" style="margin-top:0.4rem">홈으로</button>
-      </div>`;
+    App._transitionTo(() => {
+      const area = document.getElementById('lesson-area');
+      area.innerHTML = `
+        <div class="done-screen">
+          <div class="d-emoji">${allDone ? '🧩' : '👏'}</div>
+          <h2>${allDone ? '조합 완료!' : '잘했어요!'}</h2>
+          <div class="d-xp">+${this.exercises.filter(e => e.type === 'quiz').length * 10} ⭐</div>
+          <p>${allDone ? '글자 조합을 마스터했어요!' : `${this.cursor}/${this.lessons.length} 학습 완료`}</p>
+          ${allDone ? '' : `<button class="d-btn green" onclick="Step3.buildExercises()">계속 배우기</button>`}
+          <button class="d-btn blue" onclick="App.goHome()" style="margin-top:0.4rem">홈으로</button>
+        </div>`;
+    });
   },
 };

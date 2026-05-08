@@ -1,5 +1,5 @@
 // ============================================================
-// 5단계: 받아쓰기 - 듀오링고 플로우
+// 5단계: 받아쓰기 - Premium Flow
 // ============================================================
 
 const Step5 = {
@@ -13,19 +13,35 @@ const Step5 = {
 
   showDifficultySelect() {
     App.hideBottom();
-    const area = document.getElementById('lesson-area');
-    area.innerHTML = `
-      <div class="q-prompt" style="font-size:1.3rem;margin-bottom:1.5rem">받아쓰기 난이도를 골라요 ✍️</div>
-      <button class="opt" onclick="Step5.start('easy')" style="width:100%;max-width:350px;margin-bottom:0.6rem;font-size:1.2rem">
-        🌱 쉬움<div class="opt-sub">한 글자 (가, 나, 다...)</div>
-      </button>
-      <button class="opt" onclick="Step5.start('medium')" style="width:100%;max-width:350px;margin-bottom:0.6rem;font-size:1.2rem">
-        🌿 보통<div class="opt-sub">단어 (사과, 학교...)</div>
-      </button>
-      <button class="opt" onclick="Step5.start('hard')" style="width:100%;max-width:350px;font-size:1.2rem">
-        🌳 어려움<div class="opt-sub">문장 (안녕하세요...)</div>
-      </button>
-    `;
+    App._transitionTo(() => {
+      const area = document.getElementById('lesson-area');
+      area.innerHTML = `
+        <div class="q-prompt" style="font-size:1.3rem;margin-bottom:1.5rem">받아쓰기 난이도를 골라요</div>
+        <button class="diff-btn" onclick="Step5.start('easy')">
+          <div class="diff-icon">🌱</div>
+          <div class="diff-info">
+            <div class="diff-title">쉬움</div>
+            <div class="diff-desc">한 글자 (가, 나, 다...)</div>
+          </div>
+        </button>
+        <div style="height:0.6rem"></div>
+        <button class="diff-btn" onclick="Step5.start('medium')">
+          <div class="diff-icon">🌿</div>
+          <div class="diff-info">
+            <div class="diff-title">보통</div>
+            <div class="diff-desc">단어 (사과, 학교...)</div>
+          </div>
+        </button>
+        <div style="height:0.6rem"></div>
+        <button class="diff-btn" onclick="Step5.start('hard')">
+          <div class="diff-icon">🌳</div>
+          <div class="diff-info">
+            <div class="diff-title">어려움</div>
+            <div class="diff-desc">문장 (안녕하세요...)</div>
+          </div>
+        </button>
+      `;
+    });
   },
 
   start(diff) {
@@ -49,20 +65,21 @@ const Step5 = {
 
   showDictation() {
     const ex = this.exercises[this.idx];
-    const area = document.getElementById('lesson-area');
-
-    area.innerHTML = `
-      <div class="q-prompt">듣고 써 봐요! ✍️</div>
-      <button class="q-listen" onclick="Step5.play()" style="padding:1.2rem 3rem;font-size:1.4rem">🔊 듣기</button>
-      <div class="pill-row">
-        <button class="pill ${this.speed===0.6?'on':''}" onclick="Step5.setSpeed(0.6)">🐢 느림</button>
-        <button class="pill ${this.speed===1?'on':''}" onclick="Step5.setSpeed(1)">🐇 보통</button>
-        <button class="pill ${this.speed===1.3?'on':''}" onclick="Step5.setSpeed(1.3)">🚀 빠름</button>
-      </div>
-      <input type="text" class="q-input" id="dict-input"
-        placeholder="여기에 써요"
-        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-    `;
+    App._transitionTo(() => {
+      const area = document.getElementById('lesson-area');
+      area.innerHTML = `
+        <div class="q-prompt">듣고 써 봐요!</div>
+        <button class="q-listen" onclick="Step5.play()" style="padding:1.2rem 3rem;font-size:1.4rem">🔊 듣기</button>
+        <div class="pill-row">
+          <button class="pill ${this.speed===0.6?'on':''}" onclick="Step5.setSpeed(0.6)">🐢 느림</button>
+          <button class="pill ${this.speed===1?'on':''}" onclick="Step5.setSpeed(1)">🐇 보통</button>
+          <button class="pill ${this.speed===1.3?'on':''}" onclick="Step5.setSpeed(1.3)">🚀 빠름</button>
+        </div>
+        <input type="text" class="q-input" id="dict-input"
+          placeholder="여기에 써요"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      `;
+    });
 
     const input = document.getElementById('dict-input');
     input.addEventListener('input', () => {
@@ -95,7 +112,6 @@ const Step5 = {
     input.disabled = true;
     SRS.record(`d_${correct}`, ok);
 
-    // 글자 단위 채점 표시
     let gradeHtml = '';
     const maxLen = Math.max(answer.length, correct.length);
     for (let i = 0; i < maxLen; i++) {
@@ -113,7 +129,6 @@ const Step5 = {
       }
     }
 
-    // 채점 결과를 입력 아래에 표시
     const gradeDiv = document.createElement('div');
     gradeDiv.style.cssText = 'margin-top:1rem;text-align:center';
     gradeDiv.innerHTML = gradeHtml;
@@ -121,10 +136,12 @@ const Step5 = {
 
     if (ok) {
       input.style.borderColor = 'var(--green)';
+      input.style.boxShadow = '0 0 0 4px var(--green-glow)';
       App.showCorrectFeedback(() => { this.idx++; this.run(); });
     } else {
       input.style.borderColor = 'var(--red)';
-      this.exercises.push({ text: correct }); // 틀린 건 다시
+      input.style.boxShadow = '0 0 0 4px var(--red-glow)';
+      this.exercises.push({ text: correct });
       this.total = this.exercises.length;
       App.showWrongFeedback(correct, () => { this.idx++; this.run(); });
     }
@@ -132,22 +149,35 @@ const Step5 = {
 
   showEnd(type) {
     App.hideBottom();
-    const area = document.getElementById('lesson-area');
     if (type === 'fail') {
       Sound.gameOver();
-      area.innerHTML = `<div class="done-screen"><div class="d-emoji">💔</div><h2>하트가 없어요!</h2><button class="d-btn green" onclick="App.startLesson(5)">다시 하기</button><button class="d-btn blue" onclick="App.goHome()" style="margin-top:0.4rem">홈으로</button></div>`;
+      App._transitionTo(() => {
+        const area = document.getElementById('lesson-area');
+        area.innerHTML = `
+          <div class="done-screen">
+            <div class="d-emoji">💔</div>
+            <h2>하트가 없어요!</h2>
+            <p>다시 도전해요</p>
+            <button class="d-btn green" onclick="App.startLesson(5)">다시 하기</button>
+            <button class="d-btn blue" onclick="App.goHome()" style="margin-top:0.4rem">홈으로</button>
+          </div>`;
+      });
       return;
     }
     Sound.complete();
+    App.confetti();
     SRS.setProgress(5, 100); SRS.bumpStreak();
-    area.innerHTML = `
-      <div class="done-screen">
-        <div class="d-emoji">✍️</div>
-        <h2>받아쓰기 완료!</h2>
-        <div class="d-xp">+${this.exercises.length * 10} ⭐</div>
-        <p>잘 들리고 잘 써요!</p>
-        <button class="d-btn green" onclick="Step5.showDifficultySelect()">다른 난이도</button>
-        <button class="d-btn blue" onclick="App.goHome()" style="margin-top:0.4rem">홈으로</button>
-      </div>`;
+    App._transitionTo(() => {
+      const area = document.getElementById('lesson-area');
+      area.innerHTML = `
+        <div class="done-screen">
+          <div class="d-emoji">✍️</div>
+          <h2>받아쓰기 완료!</h2>
+          <div class="d-xp">+${this.exercises.length * 10} ⭐</div>
+          <p>잘 들리고 잘 써요!</p>
+          <button class="d-btn green" onclick="Step5.showDifficultySelect()">다른 난이도</button>
+          <button class="d-btn blue" onclick="App.goHome()" style="margin-top:0.4rem">홈으로</button>
+        </div>`;
+    });
   },
 };
