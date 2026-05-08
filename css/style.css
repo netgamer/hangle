@@ -782,6 +782,77 @@ body{
   }
 }
 
+/* ── 인증 카드 ── */
+.auth-card{
+  width:100%;
+  padding:0.9rem 1.1rem;
+  border:2px solid var(--gray2);border-radius:var(--radius-lg);
+  background:var(--bg);
+  box-shadow:var(--shadow-sm);
+  margin-bottom:0.4rem;
+  animation:fadeUp 0.4s var(--ease-out) both;
+}
+.auth-card.logged-in{
+  border-color:var(--green);
+  background:linear-gradient(135deg,rgba(88,204,2,0.04),rgba(88,204,2,0.01));
+}
+.auth-user{
+  display:flex;align-items:center;gap:0.8rem;
+}
+.auth-avatar{
+  width:40px;height:40px;border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--green);
+}
+.auth-avatar-placeholder{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--gray1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;
+}
+.auth-info{flex:1;min-width:0}
+.auth-name{
+  font-size:0.9rem;font-weight:700;
+  font-family:var(--font-display);
+  color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.auth-sync{
+  font-size:0.68rem;color:var(--green);
+  display:flex;align-items:center;gap:0.2rem;
+}
+.auth-logout{
+  padding:0.35rem 0.8rem;border:2px solid var(--gray2);border-radius:99px;
+  background:var(--bg);
+  font-family:var(--font-display);font-size:0.7rem;
+  color:var(--text-light);cursor:pointer;
+  transition:all 0.2s var(--ease-out);
+}
+.auth-logout:hover{border-color:var(--red);color:var(--red)}
+.auth-logout:active{transform:scale(0.95)}
+
+.auth-prompt{
+  font-size:0.78rem;color:var(--text-light);
+  text-align:center;margin-bottom:0.7rem;
+}
+.auth-google-btn{
+  width:100%;
+  display:flex;align-items:center;justify-content:center;gap:0.6rem;
+  padding:0.75rem 1rem;
+  border:2px solid var(--gray2);border-radius:var(--radius);
+  background:var(--bg);
+  font-family:var(--font-display);font-size:0.9rem;
+  color:var(--text);cursor:pointer;
+  transition:all 0.25s var(--ease-out);
+  box-shadow:var(--shadow-sm);
+}
+.auth-google-btn:hover{
+  border-color:var(--blue);
+  box-shadow:var(--shadow-md);
+  transform:translateY(-1px);
+}
+.auth-google-btn:active{transform:scale(0.97)}
+
 /* ── 반응형 ── */
 @media(max-width:480px){
   html{font-size:16px}

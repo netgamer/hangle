@@ -1,10 +1,21 @@
 // ============================================================
-// 간격 반복 + 진행 상태 관리
+// 간격 반복 + 진행 상태 관리 + 클라우드 동기화
 // ============================================================
 
 const SRS = {
   _d() { try { return JSON.parse(localStorage.getItem('hg_srs')) || {}; } catch { return {}; } },
-  _s(d) { localStorage.setItem('hg_srs', JSON.stringify(d)); },
+  _s(d) { localStorage.setItem('hg_srs', JSON.stringify(d)); this._syncDebounced(); },
+
+  // 클라우드 동기화 (디바운스: 2초 뒤 한 번만)
+  _syncTimer: null,
+  _syncDebounced() {
+    clearTimeout(this._syncTimer);
+    this._syncTimer = setTimeout(() => {
+      if (typeof SB !== 'undefined' && SB.isLoggedIn()) {
+        SB.pushToCloud();
+      }
+    }, 2000);
+  },
 
   // 학습 완료 기록
   markLearned(id) {
@@ -27,6 +38,7 @@ const SRS = {
   setProgress(step, val) {
     const p = this.getProgress(); p[step] = Math.max(p[step] || 0, val);
     localStorage.setItem('hg_prog', JSON.stringify(p));
+    this._syncDebounced();
   },
 
   // streak
@@ -48,6 +60,7 @@ const SRS = {
     s.c = s.d === y ? s.c + 1 : 1;
     s.d = t;
     localStorage.setItem('hg_streak', JSON.stringify(s));
+    this._syncDebounced();
     return s.c;
   },
 };

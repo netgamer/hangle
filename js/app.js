@@ -8,8 +8,14 @@ const App = {
   hearts: 3,
   xp: 0,
 
-  init() {
+  async init() {
     this.xp = parseInt(localStorage.getItem('hg_xp')) || 0;
+    // Supabase 초기화
+    if (typeof SB !== 'undefined') {
+      await SB.init();
+      // 클라우드에서 XP 복원됐을 수 있으므로 다시 읽기
+      this.xp = parseInt(localStorage.getItem('hg_xp')) || 0;
+    }
     this.showHome();
   },
 
@@ -19,7 +25,6 @@ const App = {
   _transitionTo(renderFn) {
     const area = document.getElementById('lesson-area');
     area.classList.remove('fade-enter');
-    // Force reflow
     void area.offsetWidth;
     renderFn();
     area.classList.add('fade-enter');
@@ -49,10 +54,69 @@ const App = {
   },
 
   // ═══════════════════════════
+  //  인증 UI 렌더링
+  // ═══════════════════════════
+  _renderAuthSection() {
+    if (typeof SB === 'undefined' || !SB._ready) {
+      return '';
+    }
+
+    if (SB.isLoggedIn()) {
+      const name = SB.getDisplayName();
+      const avatar = SB.getAvatarUrl();
+      return `
+        <div class="auth-card logged-in">
+          <div class="auth-user">
+            ${avatar
+              ? `<img class="auth-avatar" src="${avatar}" alt="" referrerpolicy="no-referrer">`
+              : `<div class="auth-avatar-placeholder">👤</div>`
+            }
+            <div class="auth-info">
+              <div class="auth-name">${name}</div>
+              <div class="auth-sync">☁️ 데이터 동기화 중</div>
+            </div>
+          </div>
+          <button class="auth-logout" onclick="App.handleLogout()">로그아웃</button>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="auth-card">
+        <div class="auth-prompt">로그인하면 기기간 학습 데이터가 동기화돼요</div>
+        <button class="auth-google-btn" onclick="App.handleGoogleLogin()">
+          <svg width="18" height="18" viewBox="0 0 18 18" style="flex-shrink:0">
+            <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.26c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/>
+            <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.997 8.997 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+          </svg>
+          Google로 로그인
+        </button>
+      </div>
+    `;
+  },
+
+  async handleGoogleLogin() {
+    if (typeof SB !== 'undefined') {
+      await SB.signInWithGoogle();
+    }
+  },
+
+  async handleLogout() {
+    Sound.tap();
+    if (typeof SB !== 'undefined') {
+      await SB.signOut();
+      this.showHome();
+    }
+  },
+
+  // ═══════════════════════════
   //  홈 화면
   // ═══════════════════════════
   showHome() {
     this.screen = 'home';
+    this.xp = parseInt(localStorage.getItem('hg_xp')) || 0;
     document.getElementById('top-bar').classList.add('hide');
     document.getElementById('bottom-bar').classList.add('hide');
     document.getElementById('feedback-bar').classList.remove('show');
@@ -85,6 +149,7 @@ const App = {
             <div class="home-stat">🔥 ${streak}일 연속</div>
             <div class="home-stat">⭐ ${this.xp} XP</div>
           </div>
+          ${this._renderAuthSection()}
           ${stages.map(s => {
             const p = prog[s.n] || 0;
             const done = p >= 80;
@@ -245,7 +310,13 @@ const App = {
     pop.textContent = `+${amount} ⭐`;
     document.body.appendChild(pop);
     setTimeout(() => pop.remove(), 1400);
+    // 클라우드 동기화
+    if (typeof SB !== 'undefined' && SB.isLoggedIn()) {
+      clearTimeout(this._xpSyncTimer);
+      this._xpSyncTimer = setTimeout(() => SB.pushToCloud(), 2000);
+    }
   },
+  _xpSyncTimer: null,
 
   // ═══════════════════════════
   //  유틸리티
