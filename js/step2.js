@@ -52,6 +52,7 @@ const Step2 = {
         <div class="lc-tap">👆 터치하면 소리가 나요</div>
       </div>
     `;
+    Sound.flip();
     setTimeout(() => App.speak(item.char), 400);
     SRS.markLearned(`v_${item.char}`);
     App.showContinue('Step2.advance()');
@@ -83,6 +84,7 @@ const Step2 = {
   },
 
   select(btn) {
+    Sound.select();
     document.querySelectorAll('.opt').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
     this.selected = btn.dataset.v;
@@ -111,9 +113,11 @@ const Step2 = {
     App.hideBottom();
     const area = document.getElementById('lesson-area');
     if (type === 'fail') {
+      Sound.gameOver();
       area.innerHTML = `<div class="done-screen"><div class="d-emoji">💔</div><h2>하트가 없어요!</h2><p>다시 도전해요</p><button class="d-btn green" onclick="App.startLesson(2)">다시 하기</button><button class="d-btn blue" onclick="App.goHome()" style="margin-top:0.4rem">홈으로</button></div>`;
       return;
     }
+    Sound.complete();
     this.cursor = Math.min(this.cursor + 3, this.items.length);
     SRS.setProgress(2, Math.round((this.cursor / this.items.length) * 100));
     SRS.bumpStreak();

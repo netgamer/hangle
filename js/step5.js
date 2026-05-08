@@ -29,6 +29,7 @@ const Step5 = {
   },
 
   start(diff) {
+    Sound.tap();
     this.difficulty = diff;
     this.exercises = [];
     const items = App.shuffle([...DATA.dictation[diff]]).slice(0, 8);
@@ -133,9 +134,11 @@ const Step5 = {
     App.hideBottom();
     const area = document.getElementById('lesson-area');
     if (type === 'fail') {
+      Sound.gameOver();
       area.innerHTML = `<div class="done-screen"><div class="d-emoji">💔</div><h2>하트가 없어요!</h2><button class="d-btn green" onclick="App.startLesson(5)">다시 하기</button><button class="d-btn blue" onclick="App.goHome()" style="margin-top:0.4rem">홈으로</button></div>`;
       return;
     }
+    Sound.complete();
     SRS.setProgress(5, 100); SRS.bumpStreak();
     area.innerHTML = `
       <div class="done-screen">

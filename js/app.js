@@ -33,7 +33,6 @@ const App = {
       { n:5, icon:'✍️', title:'받아쓰기', desc:'듣고 직접 써보기', color:'--purple' },
     ];
 
-    // 현재 단계 판단
     let currentStage = 1;
     for (let i = 1; i <= 5; i++) {
       if ((prog[i] || 0) >= 80) currentStage = i + 1;
@@ -71,6 +70,7 @@ const App = {
   //  레슨 시작
   // ═══════════════════════════
   startLesson(step) {
+    Sound.tap();
     this.screen = 'lesson';
     this.currentStep = step;
     this.hearts = 3;
@@ -87,6 +87,7 @@ const App = {
   },
 
   goHome() {
+    Sound.tap();
     this.showHome();
   },
 
@@ -106,11 +107,13 @@ const App = {
   showCheck(label, cls, onclick) {
     const bar = document.getElementById('bottom-bar');
     bar.classList.remove('hide');
-    bar.innerHTML = `<button class="check-btn ${cls}" onclick="${onclick}">${label}</button>`;
+    bar.innerHTML = `<button class="check-btn ${cls}" onclick="Sound.tap(); ${onclick}">${label}</button>`;
   },
 
   showCheckDisabled() {
-    this.showCheck('확인', 'gray', '');
+    const bar = document.getElementById('bottom-bar');
+    bar.classList.remove('hide');
+    bar.innerHTML = `<button class="check-btn gray">확인</button>`;
   },
 
   showCheckReady(onclick) {
@@ -130,6 +133,8 @@ const App = {
   // ═══════════════════════════
   showCorrectFeedback(onNext) {
     this.hideBottom();
+    Sound.correct();
+
     const fb = document.getElementById('feedback-bar');
     fb.className = 'feedback-bar correct show';
     fb.innerHTML = `
@@ -139,14 +144,22 @@ const App = {
       </div>
       <button class="fb-next" id="fb-next-btn">계속</button>
     `;
-    document.getElementById('fb-next-btn').onclick = () => { fb.classList.remove('show'); onNext(); };
+    document.getElementById('fb-next-btn').onclick = () => {
+      Sound.tap();
+      fb.classList.remove('show');
+      onNext();
+    };
     this.addXP(10);
   },
 
   showWrongFeedback(correctAnswer, onNext) {
     this.hideBottom();
+    Sound.wrong();
     this.hearts--;
     this._animateHeart();
+
+    if (this.hearts <= 0) Sound.gameOver();
+    else Sound.heartLost();
 
     const fb = document.getElementById('feedback-bar');
     fb.className = 'feedback-bar wrong show';
@@ -157,7 +170,11 @@ const App = {
       </div>
       <button class="fb-next" id="fb-next-btn">계속</button>
     `;
-    document.getElementById('fb-next-btn').onclick = () => { fb.classList.remove('show'); onNext(); };
+    document.getElementById('fb-next-btn').onclick = () => {
+      Sound.tap();
+      fb.classList.remove('show');
+      onNext();
+    };
   },
 
   hideFeedback() {
@@ -183,7 +200,7 @@ const App = {
     this.xp += amount;
     localStorage.setItem('hg_xp', this.xp);
     document.getElementById('xp-count').textContent = this.xp;
-    // 팝업
+    Sound.xp();
     const pop = document.createElement('div');
     pop.className = 'xp-popup';
     pop.textContent = `+${amount} ⭐`;
@@ -217,7 +234,7 @@ const App = {
     return this.shuffle([correct, ...picked]);
   },
 
-  updateHeader() {}, // compat
+  updateHeader() {},
 };
 
 document.addEventListener('DOMContentLoaded', () => App.init());

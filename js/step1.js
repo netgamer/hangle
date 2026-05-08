@@ -69,6 +69,7 @@ const Step1 = {
         <div class="lc-tap">👆 터치하면 소리가 나요</div>
       </div>
     `;
+    Sound.flip();
     setTimeout(() => App.speak(item.char), 400);
 
     SRS.markLearned(`c_${item.char}`);
@@ -108,6 +109,7 @@ const Step1 = {
   },
 
   select(btn) {
+    Sound.select();
     document.querySelectorAll('.opt').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
     this.selected = btn.dataset.v;
@@ -140,6 +142,7 @@ const Step1 = {
   // ── 완료 ──
   showDone() {
     App.hideBottom();
+    Sound.complete();
     this.cursor = Math.min(this.cursor + 3, this.items.length);
     const pct = Math.round((this.cursor / this.items.length) * 100);
     SRS.setProgress(1, pct);
@@ -165,6 +168,7 @@ const Step1 = {
 
   showFail() {
     App.hideBottom();
+    Sound.gameOver();
     const area = document.getElementById('lesson-area');
     area.innerHTML = `
       <div class="done-screen">
