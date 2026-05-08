@@ -211,7 +211,71 @@ const App = {
   // ═══════════════════════════
   //  유틸리티
   // ═══════════════════════════
+  // TTS: 미리 생성된 mp3 사용, 없으면 Web Speech API 폴백
+  _audioCache: {},
+  _currentAudio: null,
+
   speak(text, rate = 1) {
+    // 기존 재생 중지
+    if (this._currentAudio) {
+      this._currentAudio.pause();
+      this._currentAudio.currentTime = 0;
+    }
+
+    // 키 매핑: text → 오디오 파일명 찾기
+    const key = this._findAudioKey(text);
+    if (key) {
+      const path = `audio/${key}.mp3`;
+      let audio = this._audioCache[key];
+      if (!audio) {
+        audio = new Audio(path);
+        this._audioCache[key] = audio;
+      }
+      audio.currentTime = 0;
+      audio.playbackRate = rate;
+      audio.play().catch(() => this._fallbackSpeak(text, rate));
+      this._currentAudio = audio;
+      return;
+    }
+
+    // mp3 없으면 Web Speech API 폴백
+    this._fallbackSpeak(text, rate);
+  },
+
+  _findAudioKey(text) {
+    // 자음 이름 → 파일 매핑
+    const consonantMap = {
+      'ㄱ':'c_ㄱ','ㄴ':'c_ㄴ','ㄷ':'c_ㄷ','ㄹ':'c_ㄹ','ㅁ':'c_ㅁ',
+      'ㅂ':'c_ㅂ','ㅅ':'c_ㅅ','ㅇ':'c_ㅇ','ㅈ':'c_ㅈ','ㅊ':'c_ㅊ',
+      'ㅋ':'c_ㅋ','ㅌ':'c_ㅌ','ㅍ':'c_ㅍ','ㅎ':'c_ㅎ',
+      'ㄲ':'c_ㄲ','ㄸ':'c_ㄸ','ㅃ':'c_ㅃ','ㅆ':'c_ㅆ','ㅉ':'c_ㅉ',
+    };
+    if (consonantMap[text]) return consonantMap[text];
+
+    // 모음
+    const vowelMap = {
+      'ㅏ':'v_ㅏ','ㅑ':'v_ㅑ','ㅓ':'v_ㅓ','ㅕ':'v_ㅕ','ㅗ':'v_ㅗ',
+      'ㅛ':'v_ㅛ','ㅜ':'v_ㅜ','ㅠ':'v_ㅠ','ㅡ':'v_ㅡ','ㅣ':'v_ㅣ',
+      'ㅐ':'v_ㅐ','ㅔ':'v_ㅔ','ㅘ':'v_ㅘ','ㅝ':'v_ㅝ','ㅟ':'v_ㅟ','ㅢ':'v_ㅢ',
+    };
+    if (vowelMap[text]) return vowelMap[text];
+
+    // 조합 글자 / 단어 / 받아쓰기: 여러 prefix 시도
+    const prefixes = ['j_', 'w_', 'd_'];
+    const safeText = text.replace(/ /g, '_');
+    for (const p of prefixes) {
+      const key = p + safeText;
+      // 캐시에 있거나 시도
+      if (this._audioCache[key]) return key;
+    }
+    // 없으면 순서대로 시도 (첫 로드)
+    for (const p of prefixes) {
+      return p + safeText;  // 시도해보고 실패하면 폴백
+    }
+    return null;
+  },
+
+  _fallbackSpeak(text, rate) {
     if (!('speechSynthesis' in window)) return;
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
