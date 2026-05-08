@@ -1,0 +1,298 @@
+/* ============================================================
+   한글 공부 - 듀오링고 스타일
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --green:#58CC02;--green-dark:#46a302;--green-bg:#d7ffb8;
+  --red:#FF4B4B;--red-bg:#ffdfe0;
+  --blue:#1CB0F6;--blue-dark:#0099e0;
+  --gold:#FFC800;--gold-bg:#fff4cc;
+  --purple:#CE82FF;
+  --pink:#FF6B9D;
+  --orange:#FF9600;
+  --gray1:#F7F7F7;--gray2:#E5E5E5;--gray3:#AFAFAF;--gray4:#777;
+  --text:#3C3C3C;--text-light:#777;
+  --bg:#fff;
+  --radius:16px;
+  --font:'Jua',sans-serif;
+}
+
+html{font-size:18px}
+body{
+  font-family:var(--font);background:var(--bg);color:var(--text);
+  min-height:100dvh;display:flex;flex-direction:column;
+  -webkit-tap-highlight-color:transparent;user-select:none;
+  overflow-x:hidden;
+}
+
+/* ── 상단 바 ── */
+.top-bar{
+  display:flex;align-items:center;gap:0.6rem;
+  padding:0.6rem 1rem;
+  position:sticky;top:0;z-index:100;background:var(--bg);
+  border-bottom:2px solid var(--gray1);
+}
+.top-close{
+  font-size:1.3rem;color:var(--gray3);cursor:pointer;
+  background:none;border:none;padding:0.2rem;
+}
+.top-progress{
+  flex:1;height:14px;background:var(--gray2);border-radius:10px;overflow:hidden;
+}
+.top-progress-fill{
+  height:100%;background:var(--green);border-radius:10px;
+  transition:width 0.4s ease;
+}
+.top-hearts{
+  display:flex;align-items:center;gap:0.15rem;
+  color:var(--red);font-size:1.1rem;
+}
+.top-hearts span{font-size:0.85rem;font-weight:bold;margin-left:0.1rem;}
+.top-xp{
+  display:flex;align-items:center;gap:0.15rem;
+  color:var(--gold);font-size:0.85rem;font-weight:bold;
+}
+
+/* ── 메인 영역 ── */
+.lesson-area{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:1.5rem 1rem 8rem;
+  max-width:600px;margin:0 auto;width:100%;
+}
+
+/* ── 홈 화면 (단계 선택) ── */
+.home{
+  display:flex;flex-direction:column;align-items:center;
+  gap:0.8rem;padding:1.5rem 1rem;
+  max-width:500px;margin:0 auto;width:100%;
+}
+.home-title{
+  font-size:1.6rem;margin-bottom:0.5rem;
+  display:flex;align-items:center;gap:0.5rem;
+}
+.home-stats{
+  display:flex;gap:1.5rem;margin-bottom:1rem;
+  font-size:0.85rem;color:var(--text-light);
+}
+.stage-btn{
+  width:100%;padding:1.2rem;
+  border:3px solid var(--gray2);border-radius:var(--radius);
+  background:var(--bg);cursor:pointer;
+  display:flex;align-items:center;gap:1rem;
+  transition:all 0.2s;font-family:var(--font);
+  text-align:left;
+}
+.stage-btn:active{transform:scale(0.98)}
+.stage-btn .s-icon{font-size:2.2rem}
+.stage-btn .s-info{flex:1}
+.stage-btn .s-title{font-size:1.05rem;color:var(--text)}
+.stage-btn .s-desc{font-size:0.7rem;color:var(--text-light);margin-top:0.1rem}
+.stage-btn .s-prog{
+  width:50px;height:50px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.75rem;font-weight:bold;
+  border:3px solid var(--gray2);color:var(--text-light);
+}
+.stage-btn.done{border-color:var(--green)}
+.stage-btn.done .s-prog{border-color:var(--green);color:var(--green)}
+.stage-btn.current{border-color:var(--blue);box-shadow:0 3px 15px rgba(28,176,246,0.15)}
+.stage-btn.current .s-prog{border-color:var(--blue);color:var(--blue)}
+
+/* ── 학습 카드 ── */
+.learn-card{
+  background:var(--bg);border-radius:var(--radius);
+  padding:1.5rem;width:100%;max-width:380px;
+  text-align:center;
+  border:3px solid var(--gray2);
+  cursor:pointer;transition:transform 0.15s;
+}
+.learn-card:active{transform:scale(0.97)}
+.learn-card .lc-emoji{font-size:2.5rem;margin-bottom:0.2rem}
+.learn-card .lc-char{
+  font-size:7rem;line-height:1.1;
+  color:var(--blue);
+}
+.learn-card .lc-sub{font-size:1.1rem;color:var(--text-light);margin-top:0.3rem}
+.learn-card .lc-hint{
+  display:inline-block;margin-top:0.6rem;
+  padding:0.3rem 0.9rem;border-radius:50px;
+  background:var(--blue);color:white;font-size:0.8rem;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+}
+.learn-card .lc-tap{
+  font-size:0.7rem;color:var(--gray3);margin-top:0.7rem;
+}
+
+/* ── 퀴즈 문제 영역 ── */
+.q-prompt{
+  font-size:1.1rem;color:var(--text);margin-bottom:1rem;text-align:center;
+}
+.q-big{
+  font-size:5rem;text-align:center;margin-bottom:0.5rem;line-height:1.1;
+}
+.q-listen{
+  display:inline-flex;align-items:center;gap:0.4rem;
+  padding:1rem 2.5rem;border:3px solid var(--blue);border-radius:var(--radius);
+  background:white;color:var(--blue);font-family:var(--font);font-size:1.2rem;
+  cursor:pointer;transition:all 0.15s;margin-bottom:1rem;
+}
+.q-listen:active{background:var(--blue);color:white}
+
+/* ── 선택지 ── */
+.opts{
+  display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;
+  width:100%;max-width:400px;
+}
+.opts.single-col{grid-template-columns:1fr}
+
+.opt{
+  padding:1rem;border:3px solid var(--gray2);border-radius:var(--radius);
+  background:white;font-family:var(--font);font-size:1.8rem;
+  cursor:pointer;transition:all 0.15s;text-align:center;
+  position:relative;
+}
+.opt:active{transform:scale(0.97)}
+.opt.selected{border-color:var(--blue);background:#e8f4fd;color:var(--blue)}
+.opt.correct-show{border-color:var(--green);background:var(--green-bg);color:var(--green-dark)}
+.opt.wrong-show{border-color:var(--red);background:var(--red-bg);color:var(--red)}
+.opt.dim{opacity:0.35;pointer-events:none}
+.opt .opt-sub{font-size:0.75rem;color:var(--text-light);margin-top:0.2rem}
+
+/* ── 입력 ── */
+.q-input{
+  padding:0.9rem 1rem;border:3px solid var(--gray2);border-radius:var(--radius);
+  font-family:var(--font);font-size:2rem;text-align:center;
+  width:100%;max-width:400px;outline:none;transition:border-color 0.2s;
+}
+.q-input:focus{border-color:var(--blue)}
+
+/* ── 하단 고정 바 ── */
+.bottom-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  padding:1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+  display:flex;justify-content:center;
+  z-index:90;
+  transition:all 0.3s ease;
+  background:white;
+  border-top:2px solid var(--gray1);
+}
+
+.check-btn{
+  width:100%;max-width:400px;padding:0.9rem;
+  border:none;border-radius:var(--radius);
+  font-family:var(--font);font-size:1.1rem;
+  cursor:pointer;transition:all 0.15s;
+  color:white;
+}
+.check-btn:active{transform:scale(0.97)}
+.check-btn.green{background:var(--green);box-shadow:0 4px 0 var(--green-dark)}
+.check-btn.green:active{box-shadow:0 2px 0 var(--green-dark);transform:translateY(2px)}
+.check-btn.gray{background:var(--gray2);color:var(--gray3);pointer-events:none}
+.check-btn.blue{background:var(--blue);box-shadow:0 4px 0 var(--blue-dark)}
+
+/* ── 피드백 바 (슬라이드업) ── */
+.feedback-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  padding:1.2rem 1.5rem calc(1.2rem + env(safe-area-inset-bottom));
+  display:flex;align-items:center;justify-content:space-between;
+  z-index:95;
+  transform:translateY(100%);
+  transition:transform 0.3s ease;
+}
+.feedback-bar.show{transform:translateY(0)}
+.feedback-bar.correct{background:var(--green-bg);border-top:3px solid var(--green)}
+.feedback-bar.wrong{background:var(--red-bg);border-top:3px solid var(--red)}
+
+.fb-left{display:flex;align-items:center;gap:0.6rem}
+.fb-icon{font-size:2rem}
+.fb-text{font-size:0.95rem}
+.fb-text strong{font-size:1.1rem;display:block}
+.feedback-bar.correct .fb-text{color:var(--green-dark)}
+.feedback-bar.wrong .fb-text{color:var(--red)}
+
+.fb-next{
+  padding:0.7rem 1.5rem;border:none;border-radius:var(--radius);
+  font-family:var(--font);font-size:0.95rem;color:white;cursor:pointer;
+}
+.feedback-bar.correct .fb-next{background:var(--green)}
+.feedback-bar.wrong .fb-next{background:var(--red)}
+
+/* ── 완료 화면 ── */
+.done-screen{text-align:center;padding:2rem 1rem}
+.done-screen .d-emoji{font-size:5rem;margin-bottom:0.5rem}
+.done-screen h2{font-size:1.6rem;margin-bottom:0.3rem}
+.done-screen .d-score{font-size:2.5rem;color:var(--green);margin:0.5rem 0}
+.done-screen .d-xp{
+  display:inline-flex;align-items:center;gap:0.3rem;
+  padding:0.5rem 1.5rem;border-radius:50px;
+  background:var(--gold-bg);color:var(--gold);
+  font-size:1.2rem;margin:0.5rem 0;
+}
+.done-screen p{color:var(--text-light);font-size:0.85rem;margin-top:0.3rem}
+.done-screen .d-btn{
+  display:block;width:100%;max-width:300px;margin:0.6rem auto 0;
+  padding:0.9rem;border:none;border-radius:var(--radius);
+  font-family:var(--font);font-size:1rem;cursor:pointer;color:white;
+}
+.done-screen .d-btn.green{background:var(--green)}
+.done-screen .d-btn.blue{background:var(--blue)}
+
+/* ── 글자 단위 채점 (받아쓰기) ── */
+.char-grade{display:inline-block;font-size:1.8rem;margin:0.1rem;padding:0.1rem 0.4rem;border-radius:8px}
+.char-grade.ok{background:var(--green-bg);color:var(--green-dark)}
+.char-grade.no{background:var(--red-bg);color:var(--red);text-decoration:line-through}
+.char-grade .cg-ans{display:block;font-size:0.65rem;color:var(--green);text-decoration:none}
+
+/* ── 속도/난이도 선택 ── */
+.pill-row{display:flex;gap:0.3rem;justify-content:center;margin:0.5rem 0}
+.pill{
+  padding:0.3rem 0.8rem;border:2px solid var(--gray2);border-radius:50px;
+  background:white;font-family:var(--font);font-size:0.75rem;cursor:pointer;
+}
+.pill.on{border-color:var(--purple);background:var(--purple);color:white}
+
+/* ── 카테고리 (단어) ── */
+.cat-row{display:flex;gap:0.4rem;flex-wrap:wrap;justify-content:center;margin-bottom:0.8rem}
+.cat{
+  padding:0.35rem 0.8rem;border:2px solid var(--gray2);border-radius:50px;
+  background:white;font-family:var(--font);font-size:0.75rem;cursor:pointer;
+}
+.cat.on{border-color:var(--orange);background:var(--orange);color:white}
+
+/* ── 하트 깨지는 애니메이션 ── */
+@keyframes heartBreak{
+  0%{transform:scale(1)}
+  30%{transform:scale(1.3)}
+  60%{transform:scale(0.8)}
+  100%{transform:scale(1)}
+}
+.heart-break{animation:heartBreak 0.5s ease}
+
+/* ── 경험치 팝업 ── */
+.xp-popup{
+  position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);
+  font-size:3rem;color:var(--gold);z-index:200;pointer-events:none;
+  animation:xpPop 1s ease forwards;
+}
+@keyframes xpPop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(0.5)}
+  30%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}
+  100%{opacity:0;transform:translate(-50%,-80%) scale(0.8)}
+}
+
+/* ── 반응형 ── */
+@media(max-width:480px){
+  html{font-size:16px}
+  .learn-card .lc-char{font-size:5rem}
+  .opt{font-size:1.5rem;padding:0.8rem}
+}
+@media(min-width:768px){
+  html{font-size:20px}
+}
+@media(min-width:1024px){
+  html{font-size:22px}
+}

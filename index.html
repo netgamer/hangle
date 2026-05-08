@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>한글 공부</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐰</text></svg>">
+  <style>.hide{display:none!important}</style>
+</head>
+<body>
+
+  <!-- 상단 바 -->
+  <div class="top-bar hide" id="top-bar">
+    <button class="top-close" onclick="App.goHome()">✕</button>
+    <div class="top-progress"><div class="top-progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="top-hearts">❤️ <span id="heart-count">3</span></div>
+    <div class="top-xp">⭐ <span id="xp-count">0</span></div>
+  </div>
+
+  <!-- 메인 영역 -->
+  <div class="lesson-area" id="lesson-area"></div>
+
+  <!-- 하단 확인 버튼 -->
+  <div class="bottom-bar hide" id="bottom-bar"></div>
+
+  <!-- 피드백 바 -->
+  <div class="feedback-bar" id="feedback-bar"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/srs.js"></script>
+  <script src="js/step1.js"></script>
+  <script src="js/step2.js"></script>
+  <script src="js/step3.js"></script>
+  <script src="js/step4.js"></script>
+  <script src="js/step5.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
